@@ -60,6 +60,16 @@ const routes = [
         component: () => import('@/views/login/index.vue')
     },
     {
+        path: '/oidc/consent',
+        name: 'oidc-consent',
+        component: () => import('@/views/oidc-consent/index.vue')
+    },
+    {
+        path: '/oidc/logout',
+        name: 'oidc-logout',
+        component: () => import('@/views/oidc-logout/index.vue')
+    },
+    {
         path: '/test',
         name: 'test',
         component: () => import('@/views/test/index.vue')
@@ -100,8 +110,14 @@ router.beforeEach((to, from, next) => {
 
     const token = localStorage.getItem('token')
 
+    //登出页负责清理会话, 无token时也要能打开
+    if (to.name === 'oidc-logout') {
+        return next()
+    }
+
     if (!token && to.name !== 'login') {
-        return next({name: 'login'})
+        //登录后回到原地址, 否则oidc授权请求会在登录后丢失
+        return next({name: 'login', query: {redirect: to.fullPath}})
     }
 
     if (!token && to.name === 'login') {
@@ -110,7 +126,7 @@ router.beforeEach((to, from, next) => {
     }
 
     if (token && to.name === 'login') {
-        return next(from.path)
+        return next(to.query.redirect ? to.query.redirect : from.path)
     }
 
     next()

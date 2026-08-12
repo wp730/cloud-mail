@@ -411,7 +411,9 @@ async function saveToken(token) {
   routers.forEach(routerData => {
     router.addRoute('layout', routerData);
   });
-  await router.replace({name: 'layout'})
+  //从oidc授权页跳来时登录后回到原地址
+  const redirect = router.currentRoute.value.query.redirect
+  await router.replace(redirect ? redirect : {name: 'layout'})
   uiStore.showNotice()
   oauthLoading.value = false;
   bindLoading.value = false;

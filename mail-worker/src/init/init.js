@@ -29,8 +29,101 @@ const dbInit = {
 		await this.v2_8DB(c);
 		await this.v2_9DB(c);
 		await this.v3_0DB(c);
+		await this.v3_1DB(c);
 		await settingService.refresh(c);
 		return c.text('success');
+	},
+
+	async v3_1DB(c) {
+
+		try {
+			await c.env.db.prepare(`
+				CREATE TABLE IF NOT EXISTS oidc_client (
+					oidc_client_id INTEGER PRIMARY KEY AUTOINCREMENT,
+					client_id TEXT NOT NULL,
+					client_secret TEXT NOT NULL DEFAULT '',
+					name TEXT NOT NULL DEFAULT '',
+					logo TEXT NOT NULL DEFAULT '',
+					description TEXT NOT NULL DEFAULT '',
+					redirect_uris TEXT NOT NULL DEFAULT '[]',
+					post_logout_redirect_uris TEXT NOT NULL DEFAULT '[]',
+					scopes TEXT NOT NULL DEFAULT 'openid,profile,email',
+					client_type INTEGER NOT NULL DEFAULT 0,
+					skip_consent INTEGER NOT NULL DEFAULT 1,
+					status INTEGER NOT NULL DEFAULT 0,
+					id_token_ttl INTEGER NOT NULL DEFAULT 3600,
+					access_token_ttl INTEGER NOT NULL DEFAULT 7200,
+					refresh_token_ttl INTEGER NOT NULL DEFAULT 2592000,
+					create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+					user_id INTEGER NOT NULL DEFAULT 0
+				)
+			`).run();
+		} catch (e) {
+			console.warn(`跳过建表：${e.message}`);
+		}
+
+		try {
+			await c.env.db.prepare(`
+				CREATE TABLE IF NOT EXISTS oidc_grant (
+					grant_id INTEGER PRIMARY KEY AUTOINCREMENT,
+					user_id INTEGER NOT NULL,
+					client_id TEXT NOT NULL,
+					scope TEXT NOT NULL DEFAULT '',
+					create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+					update_time DATETIME
+				)
+			`).run();
+		} catch (e) {
+			console.warn(`跳过建表：${e.message}`);
+		}
+
+		try {
+			await c.env.db.prepare(`
+				CREATE TABLE IF NOT EXISTS oidc_key (
+					key_id INTEGER PRIMARY KEY AUTOINCREMENT,
+					kid TEXT NOT NULL,
+					alg TEXT NOT NULL DEFAULT 'RS256',
+					public_jwk TEXT NOT NULL,
+					private_jwk TEXT NOT NULL,
+					status INTEGER NOT NULL DEFAULT 0,
+					create_time DATETIME DEFAULT CURRENT_TIMESTAMP
+				)
+			`).run();
+		} catch (e) {
+			console.warn(`跳过建表：${e.message}`);
+		}
+
+		try {
+			await c.env.db.batch([
+				c.env.db.prepare(`CREATE UNIQUE INDEX IF NOT EXISTS idx_oidc_client_client_id ON oidc_client(client_id)`),
+				c.env.db.prepare(`CREATE UNIQUE INDEX IF NOT EXISTS idx_oidc_grant_user_client ON oidc_grant(user_id, client_id)`),
+				c.env.db.prepare(`CREATE INDEX IF NOT EXISTS idx_oidc_key_status ON oidc_key(status)`)
+			]);
+		} catch (e) {
+			console.warn(`跳过创建索引：${e.message}`);
+		}
+
+		try {
+			await c.env.db.batch([
+				c.env.db.prepare(`ALTER TABLE setting ADD COLUMN oidc INTEGER NOT NULL DEFAULT 1;`),
+				c.env.db.prepare(`ALTER TABLE setting ADD COLUMN oidc_issuer TEXT NOT NULL DEFAULT '';`)
+			]);
+		} catch (e) {
+			console.warn(`跳过字段：${e.message}`);
+		}
+
+		try {
+			await c.env.db.prepare(`
+				INSERT INTO perm (perm_id, name, perm_key, pid, type, sort) VALUES
+				(37,'OIDC应用', NULL, 0, 1, 5.2),
+				(38,'应用查看', 'oidc:query', 37, 2, 0),
+				(39,'应用添加', 'oidc:add', 37, 2, 1),
+				(40,'应用修改', 'oidc:set', 37, 2, 2),
+				(41,'应用删除', 'oidc:delete', 37, 2, 3)`).run();
+		} catch (e) {
+			console.warn(`跳过数据：${e.message}`);
+		}
+
 	},
 
 	async v3_0DB(c) {

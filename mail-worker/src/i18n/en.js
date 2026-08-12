@@ -66,6 +66,13 @@ const en = {
 	notAdmin: 'The entered email is not an administrator email',
 	emailExistDatabase: 'Email already exists in the database',
 	notConfigOss: 'Object storage not configured',
+	oidcDisabled: 'The OIDC provider is not enabled',
+	oidcNameEmpty: 'Application name is required',
+	oidcRedirectUriEmpty: 'Redirect URI is required',
+	oidcRedirectUriIllegal: 'Invalid redirect URI, it must be an absolute http or https URL without a fragment',
+	oidcScopeIllegal: 'Invalid scope',
+	oidcClientNotExist: 'Application does not exist',
+	oidcReqExpired: 'The authorization request has expired, please sign in again',
 	perms: {
 		"邮件": "Emails",
 		"邮件发送": "Send Email",
@@ -99,7 +106,12 @@ const en = {
 		"系统设置": "System Settings",
 		"设置查看": "View Settings",
 		"设置修改": "Change Settings",
-		"发件重置": "Reset Send Count"
+		"发件重置": "Reset Send Count",
+		"OIDC应用": "OIDC Apps",
+		"应用查看": "View App",
+		"应用添加": "Add App",
+		"应用修改": "Edit App",
+		"应用删除": "Delete App"
 	}
 };
 

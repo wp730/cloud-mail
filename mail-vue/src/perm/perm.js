@@ -99,6 +99,16 @@ const routers = {
             menu: true
         }
     }],
+    'oidc:query': [{
+        path: '/oidc-client',
+        name: 'oidc-client',
+        component: () => import('@/views/oidc-client/index.vue'),
+        meta: {
+            title: 'oidcApp',
+            name: 'oidc-client',
+            menu: true
+        }
+    }],
     'all-email:query': [{
         path: '/all-mail',
         name: 'all-email',

@@ -385,6 +385,27 @@
             </div>
           </div>
 
+          <div class="settings-card">
+            <div class="card-title">{{ $t('oidcProvider') }}</div>
+            <div class="card-content">
+              <div class="setting-item">
+                <div><span>{{ $t('oidcEnable') }}</span></div>
+                <div>
+                  <el-switch @change="changeField('oidc', $event)" :before-change="beforeChange" :active-value="0"
+                             :inactive-value="1" v-model="setting.oidc"/>
+                </div>
+              </div>
+              <div class="setting-item">
+                <div><span>{{ $t('oidcEndpoint') }}</span></div>
+                <div class="forward">
+                  <el-button class="opt-button" size="small" type="primary" @click="openOidcSetting">
+                    <Icon icon="fluent:settings-48-regular" width="18" height="18"/>
+                  </el-button>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div class="settings-card about">
             <div class="card-title">{{ $t('about') }}</div>
             <div class="card-content">
@@ -567,6 +588,40 @@
             <el-switch v-model="tgBotStatus" :active-value="0" :inactive-value="1" :active-text="$t('enable')"
                        :inactive-text="$t('disable')"/>
             <el-button :loading="settingLoading" type="primary" @click="tgBotSave">
+              {{ $t('save') }}
+            </el-button>
+          </div>
+        </template>
+      </el-dialog>
+      <el-dialog
+          v-model="oidcShow"
+          class="forward-dialog"
+      >
+        <template #header>
+          <div class="forward-head">
+            <span class="forward-set-title">{{ $t('oidcProvider') }}</span>
+            <el-tooltip effect="dark" :content="$t('oidcIssuerDesc')">
+              <Icon class="warning" icon="fe:warning" width="18" height="18"/>
+            </el-tooltip>
+          </div>
+        </template>
+        <div class="forward-set-body">
+          <el-input :placeholder="$t('oidcIssuerDesc')" v-model="oidcIssuer"></el-input>
+          <div class="oidc-endpoint" v-for="item in oidcEndpoints" :key="item.label">
+            <span class="oidc-endpoint-label">{{ item.label }}</span>
+            <el-input :model-value="item.url" readonly>
+              <template #suffix>
+                <Icon class="oidc-copy" icon="lsicon:copy-outline" width="18" height="18"
+                      @click="copyText(item.url)"/>
+              </template>
+            </el-input>
+          </div>
+        </div>
+        <template #footer>
+          <div class="dialog-footer">
+            <el-switch v-model="oidcStatus" :active-value="0" :inactive-value="1" :active-text="$t('enable')"
+                       :inactive-text="$t('disable')"/>
+            <el-button :loading="settingLoading" type="primary" @click="oidcSave">
               {{ $t('save') }}
             </el-button>
           </div>
@@ -895,6 +950,23 @@ const noticeForm = reactive({
   noticeWidth: 0
 })
 
+const oidcShow = ref(false)
+const oidcIssuer = ref('')
+const oidcStatus = ref(1)
+
+//issuer留空时后端取请求origin, 这里同样按当前站点地址预览
+const oidcEndpoints = computed(() => {
+  const base = (oidcIssuer.value.trim() || window.location.origin).replace(/\/+$/, '')
+  return [
+    {label: 'discovery', url: `${base}/.well-known/openid-configuration`},
+    {label: 'authorize', url: `${base}/api/oidc/authorize`},
+    {label: 'token', url: `${base}/api/oidc/token`},
+    {label: 'userinfo', url: `${base}/api/oidc/userinfo`},
+    {label: 'jwks', url: `${base}/api/oidc/jwks`},
+    {label: 'logout', url: `${base}/api/oidc/logout`}
+  ]
+})
+
 const regKeyOptions = computed(() => [
   {label: t('enable'), value: 0},
   {label: t('disable'), value: 1},
@@ -1096,6 +1168,28 @@ function saveNoticePopup() {
 
 function previewNoticePopup() {
   uiStore.previewNotice({...noticeForm})
+}
+
+function openOidcSetting() {
+  oidcStatus.value = setting.value.oidc
+  oidcIssuer.value = setting.value.oidcIssuer || ''
+  oidcShow.value = true
+}
+
+function oidcSave() {
+  editSetting({
+    oidc: oidcStatus.value,
+    oidcIssuer: oidcIssuer.value.trim()
+  })
+}
+
+async function copyText(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    ElMessage({message: t('copySuccessMsg'), type: 'success', plain: true})
+  } catch (err) {
+    console.error('复制失败:', err);
+  }
 }
 
 function openThirdEmailSetting() {
@@ -1485,6 +1579,7 @@ function editSetting(settingForm, refreshStatus = true) {
     resendTokenFormShow.value = false
     turnstileShow.value = false
     tgSettingShow.value = false
+    oidcShow.value = false
     thirdEmailShow.value = false
     forwardRulesShow.value = false
     addVerifyCountShow.value = false
@@ -1812,6 +1907,22 @@ function editSetting(settingForm, refreshStatus = true) {
 .forward-set-body {
   display: flex;
   flex-direction: column;
+
+  .oidc-endpoint {
+    margin-top: 10px;
+
+    .oidc-endpoint-label {
+      display: block;
+      font-size: 12px;
+      color: var(--el-text-color-secondary);
+      padding-bottom: 4px;
+    }
+
+    .oidc-copy {
+      cursor: pointer;
+      color: #606266;
+    }
+  }
 
   .el-switch {
     align-self: end;

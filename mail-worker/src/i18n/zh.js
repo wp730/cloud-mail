@@ -66,6 +66,13 @@ const zh = {
 	notAdmin: '输入的邮箱不是管理员邮箱',
 	emailExistDatabase: '有邮箱已存在数据库中',
 	notConfigOss: '对象存储未配置',
+	oidcDisabled: 'OIDC认证服务未开启',
+	oidcNameEmpty: '应用名称不能为空',
+	oidcRedirectUriEmpty: '回调地址不能为空',
+	oidcRedirectUriIllegal: '回调地址不合法, 必须是不带片段的http或https绝对地址',
+	oidcScopeIllegal: '授权范围不合法',
+	oidcClientNotExist: '应用不存在',
+	oidcReqExpired: '授权请求已失效, 请重新发起登录',
 	perms: {
 		"邮件": "邮件",
 		"邮件发送": "邮件发送",
@@ -99,7 +106,12 @@ const zh = {
 		"系统设置": "系统设置",
 		"设置查看": "设置查看",
 		"设置修改": "设置修改",
-		'发件重置': '发件重置'
+		'发件重置': '发件重置',
+		"OIDC应用": "OIDC应用",
+		"应用查看": "应用查看",
+		"应用添加": "应用添加",
+		"应用修改": "应用修改",
+		"应用删除": "应用删除"
 	}
 }
 

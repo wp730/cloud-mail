@@ -34,7 +34,9 @@ http.interceptors.response.use((res) => {
                     repeatNum: -4,
                 })
                 localStorage.removeItem('token')
-                router.replace('/login')
+                //oidc授权流程中途掉线时保留原地址, 重新登录后继续授权
+                const current = router.currentRoute.value.fullPath
+                router.replace(current.startsWith('/oidc/') ? {name: 'login', query: {redirect: current}} : '/login')
                 reject(data)
             } else if (data.code === 403) {
                 ElMessage({

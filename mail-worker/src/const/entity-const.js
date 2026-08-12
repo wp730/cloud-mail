@@ -135,6 +135,25 @@ export const settingConst = {
 	authRefresh: {
 		OPEN: 1,
 		CLOSE: 0
+	},
+	oidc: {
+		OPEN: 0,
+		CLOSE: 1
+	}
+}
+
+export const oidcConst = {
+	status: {
+		OPEN: 0,
+		CLOSE: 1
+	},
+	skipConsent: {
+		OPEN: 0,
+		CLOSE: 1
+	},
+	clientType: {
+		CONFIDENTIAL: 0,
+		PUBLIC: 1
 	}
 }
 

@@ -9,8 +9,18 @@ app.use('*', cors());
 app.onError((err, c) => {
 	if (err.name === 'BizError') {
 		console.log(err.message);
+	} else if (err.name === 'OidcError') {
+		console.log(`${err.error}: ${err.message}`);
 	} else {
 		console.error(err);
+	}
+
+	if (err.name === 'OidcError') {
+		const headers = { 'Cache-Control': 'no-store' };
+		if (err.status === 401) {
+			headers['WWW-Authenticate'] = `Bearer error="${err.error}", error_description="${err.message}"`;
+		}
+		return c.json({ error: err.error, error_description: err.message }, err.status, headers);
 	}
 
 	if (err.message === `Cannot read properties of undefined (reading 'get')`) {

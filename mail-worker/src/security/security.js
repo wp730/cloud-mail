@@ -18,7 +18,14 @@ const exclude = [
 	'/public/genToken',
 	'/telegram',
 	'/test',
-	'/oauth'
+	'/oauth',
+	'/oidc/.well-known',
+	'/oidc/jwks',
+	'/oidc/authorize',
+	'/oidc/authInfo',
+	'/oidc/token',
+	'/oidc/userinfo',
+	'/oidc/logout'
 ];
 
 const requirePerms = [
@@ -58,7 +65,13 @@ const requirePerms = [
 	'/regKey/list',
 	'/regKey/delete',
 	'/regKey/clearNotUse',
-	'/regKey/history'
+	'/regKey/history',
+	'/oidcClient/list',
+	'/oidcClient/add',
+	'/oidcClient/set',
+	'/oidcClient/delete',
+	'/oidcClient/resetSecret',
+	'/oidcClient/secret'
 ];
 
 const premKey = {
@@ -87,6 +100,10 @@ const premKey = {
 	'reg-key:add': ['/regKey/add'],
 	'reg-key:query': ['/regKey/list','/regKey/history'],
 	'reg-key:delete': ['/regKey/delete','/regKey/clearNotUse'],
+	'oidc:query': ['/oidcClient/list','/oidcClient/secret'],
+	'oidc:add': ['/oidcClient/add'],
+	'oidc:set': ['/oidcClient/set','/oidcClient/resetSecret'],
+	'oidc:delete': ['/oidcClient/delete'],
 };
 
 app.use('*', async (c, next) => {

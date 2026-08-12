@@ -21,6 +21,12 @@ export default {
 			 return await kvObjService.toObjResp( { env }, url.pathname.substring(1));
 		 }
 
+		 //oidc发现文档必须挂在issuer根路径下, 转发到hono
+		 if (url.pathname === '/.well-known/openid-configuration') {
+			 url.pathname = '/oidc' + url.pathname
+			 return app.fetch(new Request(url.toString(), req), env, ctx);
+		 }
+
 		return env.assets.fetch(req);
 	},
 	email: email,

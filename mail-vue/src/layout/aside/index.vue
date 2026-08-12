@@ -31,7 +31,7 @@
           <Icon icon="fluent:settings-48-regular" width="20" height="20" />
           <span class="menu-name" style="margin-left: 21px">{{$t('settings')}}</span>
         </el-menu-item>
-        <div class="manage-title" v-perm="['all-email:query','user:query','role:query','setting:query','analysis:query','reg-key:query']">
+        <div class="manage-title" v-perm="['all-email:query','user:query','role:query','setting:query','analysis:query','reg-key:query','oidc:query']">
           <div>{{$t('manage')}}</div>
         </div>
         <el-menu-item @click="router.push({name: 'analysis'})" index="analysis" v-perm="'analysis:query'"
@@ -58,6 +58,11 @@
                       :class="route.meta.name === 'reg-key' ? 'choose-item' : ''">
           <Icon icon="fluent:fingerprint-20-filled" width="22" height="22" />
           <span class="menu-name" style="margin-left: 20px">{{$t('inviteCode')}}</span>
+        </el-menu-item>
+        <el-menu-item @click="router.push({name: 'oidc-client'})" index="oidc-client" v-perm="'oidc:query'"
+                      :class="route.meta.name === 'oidc-client' ? 'choose-item' : ''">
+          <Icon icon="fluent:shield-keyhole-16-regular" width="22" height="22" />
+          <span class="menu-name" style="margin-left: 20px">{{$t('oidcApp')}}</span>
         </el-menu-item>
         <el-menu-item @click="router.push({name: 'sys-setting'})" index="sys-setting" v-perm="'setting:query'"
                       :class="route.meta.name === 'sys-setting' ? 'choose-item' : ''">

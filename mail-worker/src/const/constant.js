@@ -10,7 +10,10 @@ const constant = {
 		sendCount: 0,
 		sendType: 'count',
 		accountCount: 0
-	}
+	},
+	OIDC_REQ_EXPIRE: 60 * 10,
+	OIDC_CODE_EXPIRE: 60,
+	OIDC_SCOPES: ['openid', 'profile', 'email', 'offline_access']
 }
 
 export default constant

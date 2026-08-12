@@ -101,6 +101,10 @@ const oauthService = {
 		return await orm(c).select().from(oauth).where(eq(oauth.oauthUserId, oauthUserId)).get();
 	},
 
+	async selectByUserId(c, userId) {
+		return await orm(c).select().from(oauth).where(eq(oauth.userId, userId)).get();
+	},
+
 	async deleteByUserId(c, userId) {
 		await this.deleteByUserIds(c, [userId]);
 	},

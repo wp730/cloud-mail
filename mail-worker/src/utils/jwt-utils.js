@@ -12,6 +12,8 @@ const base64urlDecode = (str) => {
 	return Uint8Array.from(atob(str), c => c.charCodeAt(0));
 };
 
+export { base64url, base64urlDecode };
+
 const jwtUtils = {
 	async generateToken(c, payload, expiresInSeconds) {
 		const header = {
@@ -82,6 +84,31 @@ const jwtUtils = {
 			console.log(err)
 			return null;
 		}
+	},
+
+	//使用RS256私钥签发jwt, 供oidc签发id_token使用
+	async signRs256(payload, privateJwk, kid) {
+
+		const header = {
+			alg: 'RS256',
+			typ: 'JWT',
+			kid
+		};
+
+		const headerStr = base64url(encoder.encode(JSON.stringify(header)));
+		const payloadStr = base64url(encoder.encode(JSON.stringify(payload)));
+		const data = `${headerStr}.${payloadStr}`;
+
+		const key = await crypto.subtle.importKey(
+			'jwk',
+			privateJwk,
+			{ name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' },
+			false,
+			['sign']
+		);
+
+		const signature = await crypto.subtle.sign('RSASSA-PKCS1-v1_5', key, encoder.encode(data));
+		return `${data}.${base64url(signature)}`;
 	}
 };
 
